@@ -1,10 +1,10 @@
-import kotlin.reflect.full.superclasses
+//import kotlin.reflect.full.superclasses
 
 plugins {
     `kotlin-dsl`
     `java-gradle-plugin`
     id("com.gradle.plugin-publish") version "1.3.1"
-
+    id("io.github.ncc0706.gradle-manifest-attributes") version "1.0.0"
 }
 
 group = "io.github.ncc0706"
@@ -28,11 +28,20 @@ dependencies {
 }
 
 
+manifestAttributes {
+    attribute("Custom1", "custom1")
+    attributes(
+        "Custom2" to project.name,
+        "Custom3" to project.version,
+    )
+}
+
 gradlePlugin {
     website.set("https://github.com/ncc0706/gradle-manifest-attributes")
     vcsUrl.set("https://github.com/ncc0706/gradle-manifest-attributes")
     plugins {
         create("manifestAttributesPlugin") {
+//            version = "1.0.1"
             id = "io.github.ncc0706.gradle-manifest-attributes"
             implementationClass = "io.github.ncc0706.gradle.plugin.ManifestAttributesPlugin"
             displayName = "Manifest Attributes Plugin"
@@ -52,4 +61,4 @@ tasks.withType<Wrapper> {
 
 //Throwable().printStackTrace()
 // [class org.gradle.kotlin.dsl.support.CompiledKotlinBuildScript]
-println(this::class.superclasses)
+//println(this::class.superclasses)

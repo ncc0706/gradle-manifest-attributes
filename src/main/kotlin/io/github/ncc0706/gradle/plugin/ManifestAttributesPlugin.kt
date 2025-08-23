@@ -2,6 +2,13 @@ package io.github.ncc0706.gradle.plugin
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.java.archives.Manifest
+import org.gradle.api.tasks.bundling.Jar
+import org.gradle.kotlin.dsl.attributes
+import org.gradle.kotlin.dsl.withType
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 /**
  * Created by IntelliJ IDEA. <br/>
@@ -13,14 +20,38 @@ import org.gradle.api.Project
 class ManifestAttributesPlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
-
-        project.task("hello-plugin"){
-
-            doLast {
-                println("Hello world!")
+        val extension = project.extensions.create("manifestAttributes", ManifestAttributesExtension::class.java)
+        project.tasks.withType(Jar::class).configureEach {
+            manifest {
+                manifestAttributes(project)
+                if(extension.customAttributes.isNotEmpty()) {
+                    attributes(extension.customAttributes)
+                }
             }
-
         }
-
     }
+
+    fun Manifest.manifestAttributes(project: Project) = attributes(
+        // 构建工具信息
+        "Built-By" to "Gradle ${project.gradle.gradleVersion}",
+        "Build-Jdk" to System.getProperty("java.version"),
+        "JDK-Vendor" to System.getProperty("java.vendor"),
+        "JDK-Version" to "${System.getProperty("java.version")} (${System.getProperty("java.vendor.version")})",
+        "Build-OS" to "${System.getProperty("os.name")} ${System.getProperty("os.version")} ${System.getProperty("os.arch")}",
+
+
+        // 版本信息
+        "Implementation-Version" to project.version,
+        "Implementation-Title" to project.name,
+
+        // 时间戳
+        "Build-Time" to LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME),
+        "Build-Date" to LocalDate.now().toString(),
+
+        // 项目信息
+        "Project-Name" to project.name,
+        "Project-Group" to project.group,
+        "Project-Version" to project.version,
+        "Plugin-Type" to "Gradle manifest plugin",
+    )
 }

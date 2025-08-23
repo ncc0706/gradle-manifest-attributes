@@ -9,4 +9,19 @@ package io.github.ncc0706.gradle.plugin
  */
 open class ManifestAttributesExtension {
 
+    val customAttributes: MutableMap<String, Any> = mutableMapOf()
+
+    fun attribute(key: String, value: Any) {
+        customAttributes[key] = value
+    }
+
+    fun attributes(vararg pairs: Pair<String, Any>) {
+        pairs.forEach { (key, value) ->
+            customAttributes[key] = value
+        }
+    }
+
+    fun attributes(map: Map<String, Any>) {
+        customAttributes.putAll(map)
+    }
 }
