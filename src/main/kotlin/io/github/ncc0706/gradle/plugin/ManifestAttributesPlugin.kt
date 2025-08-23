@@ -41,17 +41,17 @@ class ManifestAttributesPlugin : Plugin<Project> {
 
 
         // 版本信息
-        "Implementation-Version" to project.version,
         "Implementation-Title" to project.name,
+        "Implementation-Version" to project.version,
 
         // 时间戳
-        "Build-Time" to LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME),
         "Build-Date" to LocalDate.now().toString(),
+        "Build-Time" to LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME),
 
         // 项目信息
         "Project-Name" to project.name,
         "Project-Group" to project.group,
         "Project-Version" to project.version,
-        "Plugin-Type" to "Gradle manifest plugin",
+        "Plugin-Name" to "Gradle manifest plugin",
     )
 }
