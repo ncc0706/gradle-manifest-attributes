@@ -12,6 +12,9 @@ import org.gradle.plugin.use.PluginDependencySpec
  */
 // 定义简写函数：io.github.ncc0706.gradle.plugin.manifestAttrs() → 映射到实际插件 ID
 fun PluginDependenciesSpec.manifestAttrs(): PluginDependencySpec {
-    // 核心：将简写映射到你的实际插件 ID
     return id("io.github.ncc0706.gradle-manifest-attributes")
+}
+
+fun PluginDependenciesSpec.manifestAttrs(version: String): PluginDependencySpec {
+    return id("io.github.ncc0706.gradle-manifest-attributes").version(version)
 }
