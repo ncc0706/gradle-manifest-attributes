@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "io.github.ncc0706"
-version = "1.0.0"
+version = "1.0.1"
 
 repositories {
     mavenCentral()
