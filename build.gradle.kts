@@ -1,9 +1,9 @@
-import com.vanniktech.maven.publish.GradlePlugin
-import com.vanniktech.maven.publish.JavadocJar
+import com.vanniktech.maven.publish.GradlePublishPlugin
 
 plugins {
     `kotlin-dsl`
     `java-gradle-plugin`
+    alias(libs.plugins.plugin.publish)
     alias(libs.plugins.maven.publish)
 }
 
@@ -52,7 +52,7 @@ gradlePlugin {
 
 mavenPublishing {
     publishToMavenCentral(true)
-    configure(GradlePlugin(JavadocJar.Empty(), true))
+    configure(GradlePublishPlugin())
     signAllPublications()
 
     pom {
@@ -82,4 +82,8 @@ mavenPublishing {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+tasks.withType<Wrapper> {
+    distributionUrl = "https://mirrors.huaweicloud.com/gradle/gradle-8.8-all.zip"
 }

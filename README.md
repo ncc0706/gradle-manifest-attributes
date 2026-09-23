@@ -194,15 +194,23 @@ pluginManagement {
 ## 发布说明
 
 - 同仓双插件，版本号一致（当前 `1.0.1-SNAPSHOT`）
-- 使用 [vanniktech maven-publish](https://vanniktech.github.io/gradle-maven-publish-plugin/) 发往 **Maven Central**（含 Snapshot），不依赖 Plugin Portal
-- **Gradle Plugin Portal 不支持 SNAPSHOT**；本地可用 `publishToMavenLocal`
+- **双端发布**：
+  - Maven Central：`com.vanniktech.maven.publish` → `publishToMavenCentral`（支持 Snapshot）
+  - Gradle Plugin Portal：`com.gradle.plugin-publish` → `publishPlugins`（仅正式版，不支持 Snapshot）
 
 ### 凭据（`gradle.properties` 或环境变量）
 
 ```properties
+# Maven Central
 mavenCentralUsername=...
 mavenCentralPassword=...
-# 以及 signing.keyId / signing.password / signing.secretKeyRingFile
+# GPG
+signing.keyId=...
+signing.password=...
+signing.secretKeyRingFile=...
+# Plugin Portal
+gradle.publish.key=...
+gradle.publish.secret=...
 ```
 
 ### 常用命令
@@ -213,9 +221,12 @@ mavenCentralPassword=...
 
 # Maven Central Snapshot（version 需以 -SNAPSHOT 结尾）
 ./gradlew publishToMavenCentral
+
+# Plugin Portal（请使用非 SNAPSHOT 正式版，如 1.0.1）
+./gradlew publishPlugins
 ```
 
-消费者 `pluginManagement` 需包含 Snapshot 仓，例如：
+消费者若只用 Maven Snapshot，`pluginManagement` 需包含 Snapshot 仓，例如：
 
 ```kotlin
 maven {
