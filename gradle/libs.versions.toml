@@ -1,0 +1,11 @@
+[versions]
+maven-publish = "0.34.0"
+junit = "5.10.2"
+
+[libraries]
+junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+
+[plugins]
+maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publish" }

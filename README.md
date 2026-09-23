@@ -193,9 +193,36 @@ pluginManagement {
 
 ## 发布说明
 
-- 同仓双插件，版本号一致（如 `1.0.1`）
-- **Gradle Plugin Portal 不支持 SNAPSHOT**；本地 / 私服可用 `x.y.z-SNAPSHOT`
-- 首次发布 `gradle-platforms` 到 Portal 时，需为新 Plugin ID 完成认领
+- 同仓双插件，版本号一致（当前 `1.0.1-SNAPSHOT`）
+- 使用 [vanniktech maven-publish](https://vanniktech.github.io/gradle-maven-publish-plugin/) 发往 **Maven Central**（含 Snapshot），不依赖 Plugin Portal
+- **Gradle Plugin Portal 不支持 SNAPSHOT**；本地可用 `publishToMavenLocal`
+
+### 凭据（`gradle.properties` 或环境变量）
+
+```properties
+mavenCentralUsername=...
+mavenCentralPassword=...
+# 以及 signing.keyId / signing.password / signing.secretKeyRingFile
+```
+
+### 常用命令
+
+```bash
+# 本地
+./gradlew publishToMavenLocal
+
+# Maven Central Snapshot（version 需以 -SNAPSHOT 结尾）
+./gradlew publishToMavenCentral
+```
+
+消费者 `pluginManagement` 需包含 Snapshot 仓，例如：
+
+```kotlin
+maven {
+    url = uri("https://central.sonatype.com/repository/maven-snapshots/")
+    mavenContent { snapshotsOnly() }
+}
+```
 
 ## 开发与测试
 

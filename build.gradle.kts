@@ -1,11 +1,14 @@
+import com.vanniktech.maven.publish.GradlePlugin
+import com.vanniktech.maven.publish.JavadocJar
+
 plugins {
     `kotlin-dsl`
     `java-gradle-plugin`
-    id("com.gradle.plugin-publish") version "1.3.1"
+    alias(libs.plugins.maven.publish)
 }
 
 group = "io.github.ncc0706"
-version = "1.0.0"
+version = "0.0.1-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -21,9 +24,9 @@ java {
 
 dependencies {
     testImplementation(gradleTestKit())
-    testImplementation(platform("org.junit:junit-bom:5.10.2"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation(platform(libs.junit.bom))
+    testImplementation(libs.junit.jupiter)
+    testRuntimeOnly(libs.junit.platform.launcher)
 }
 
 gradlePlugin {
@@ -43,6 +46,36 @@ gradlePlugin {
             displayName = "Dependency Platforms Plugin"
             description = "Applies one or more BOMs/platforms to compileOnly, annotationProcessor and related configurations"
             tags.set(listOf("BOM", "Platform", "Dependencies"))
+        }
+    }
+}
+
+mavenPublishing {
+    publishToMavenCentral(true)
+    configure(GradlePlugin(JavadocJar.Empty(), true))
+    signAllPublications()
+
+    pom {
+        name.set("gradle-manifest-attributes")
+        description.set("Gradle plugins: JAR manifest attributes and multi-BOM platforms support")
+        url.set("https://github.com/ncc0706/gradle-manifest-attributes")
+        licenses {
+            license {
+                name.set("The Apache License, Version 2.0")
+                url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
+            }
+        }
+        developers {
+            developer {
+                id.set("ncc0706")
+                name.set("ncc0706")
+                email.set("ncc0706@gmail.com")
+            }
+        }
+        scm {
+            connection.set("scm:git:https://github.com/ncc0706/gradle-manifest-attributes.git")
+            developerConnection.set("scm:git:https://github.com/ncc0706/gradle-manifest-attributes.git")
+            url.set("https://github.com/ncc0706/gradle-manifest-attributes")
         }
     }
 }
