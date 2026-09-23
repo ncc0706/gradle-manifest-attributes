@@ -2,11 +2,11 @@ package io.github.ncc0706.gradle.plugin
 
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.provider.Provider
 import javax.inject.Inject
 
 /**
  * 通用 Platform / BOM 扩展。
- * <p>支持挂载多个 BOM（Spring / MyBatis / Hutool 等），并让指定配置继承其版本约束。</p>
  *
  * @author NiuYuxian
  * @version 1.0
@@ -35,30 +35,52 @@ open class PlatformsExtension @Inject constructor(
     )
 
     init {
-        // java / java-library 应用后再接线，避免配置尚未创建
-        project.pluginManager.withPlugin("java") {
-            wireTargetConfigurations()
+        // 配置创建时自动挂接，避免 afterEvaluate
+        project.configurations.configureEach {
+            maybeExtendFromPlatforms(this)
         }
-        project.afterEvaluate {
+        project.pluginManager.withPlugin("java") {
             wireTargetConfigurations()
         }
     }
 
     /**
-     * 添加一个 Platform / BOM。
-     * <p>可传入坐标字符串，或 Version Catalog 中的库（如 {@code libs.spring.boot.dependencies.get()}）。</p>
+     * 添加一个 Platform / BOM（坐标字符串或已解析的依赖记号）。
      *
-     * @param notation BOM 坐标或 catalog 依赖对象；若为 {@link org.gradle.api.provider.Provider} 会自动解包
+     * @param notation 例如 {@code "org.springframework.boot:spring-boot-dependencies:3.4.7"}
      */
     fun from(notation: Any) {
-        val resolved = when (notation) {
-            is org.gradle.api.provider.Provider<*> -> notation.get()
-                ?: error("platforms.from(...) 收到的 Provider 值为 null")
-            else -> notation
+        when (notation) {
+            is Provider<*> -> addPlatformProvider(notation)
+            else -> project.dependencies.add(
+                platformsConfiguration.name,
+                project.dependencies.platform(notation)
+            )
         }
-        project.dependencies.add(
+    }
+
+    /**
+     * 添加一个 Platform / BOM（支持 Version Catalog 的 Provider，无需手动 {@code .get()}）。
+     * <p>推荐写法：{@code from(libs.spring.boot.dependencies)}</p>
+     *
+     * @param notation Provider 形式的依赖记号
+     */
+    fun from(notation: Provider<*>) {
+        addPlatformProvider(notation)
+    }
+
+    /**
+     * 将 Provider 形式的 BOM 以惰性方式加入 platforms 配置。
+     *
+     * @param notation BOM Provider
+     */
+    private fun addPlatformProvider(notation: Provider<*>) {
+        project.dependencies.addProvider(
             platformsConfiguration.name,
-            project.dependencies.platform(resolved)
+            notation.map { value ->
+                requireNotNull(value) { "platforms.from(...) 收到的 Provider 值为 null" }
+                project.dependencies.platform(value)
+            }
         )
     }
 
@@ -88,10 +110,24 @@ open class PlatformsExtension @Inject constructor(
      */
     private fun wireTargetConfigurations() {
         targetConfigurationNames.forEach { name ->
-            val target = project.configurations.findByName(name) ?: return@forEach
-            if (!target.extendsFrom.contains(platformsConfiguration)) {
-                target.extendsFrom(platformsConfiguration)
-            }
+            project.configurations.findByName(name)?.let { maybeExtendFromPlatforms(it) }
+        }
+    }
+
+    /**
+     * 若配置名在目标列表中，则继承 platforms 配置。
+     *
+     * @param configuration 待检查的配置
+     */
+    private fun maybeExtendFromPlatforms(configuration: Configuration) {
+        if (configuration.name !in targetConfigurationNames) {
+            return
+        }
+        if (configuration === platformsConfiguration) {
+            return
+        }
+        if (!configuration.extendsFrom.contains(platformsConfiguration)) {
+            configuration.extendsFrom(platformsConfiguration)
         }
     }
 

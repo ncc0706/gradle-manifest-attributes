@@ -1,49 +1,42 @@
-# Gradle manifest attributes
+# Gradle Plugins by ncc0706
 
-## Overview
+本仓库发布 **两个** Gradle 插件（同版本号、一次发布）：
 
-The **Manifest Attributes Plugin** is a Gradle plugin designed to automate and standardize the population of the `MANIFEST.MF`file within JAR artifacts. It injects a comprehensive set of build-time and project-related attributes into the manifest, enhancing traceability, auditing, and runtime diagnostics for your Java applications. Furthermore, it provides a flexible extension mechanism for adding custom attributes beyond the default set.
+| Plugin ID | 职责 |
+|-----------|------|
+| `io.github.ncc0706.gradle-manifest-attributes` | 为 JAR 写入标准化 `MANIFEST.MF` 属性 |
+| `io.github.ncc0706.gradle-platforms` | 将一个或多个 BOM/Platform 应用到 `compileOnly`、`annotationProcessor` 等配置 |
 
-## Features
+可按需只引用其中一个，也可两个一起用。
 
-- **Automatic Attribute Injection**: Automatically configures the manifest for all `Jar`tasks within the project.
-- **Comprehensive Build Context**: Captures essential build environment details such as JDK version, Gradle version, operating system, and build timestamp.
-- **Project Metadata**: Includes fundamental project information like name, group, and version directly from the Gradle project model.
-- **Extensibility**: Supports the addition of arbitrary custom manifest attributes through a dedicated configuration block.
+---
 
-## Usage
+## 1. Manifest Attributes Plugin
 
-### Applying the Plugin
+### 功能
 
-To integrate the plugin into your project, apply it within your build script using the plugins block.
+- 自动为所有 `Jar` 任务注入构建与项目元数据
+- 支持通过扩展追加自定义属性
 
-**Kotlin DSL:**
+### 应用
+
+**Kotlin DSL：**
 
 ```kotlin
 plugins {
-     // ...
-    id("io.github.ncc0706.gradle-manifest-attributes") version "1.0.0"
+    id("io.github.ncc0706.gradle-manifest-attributes") version "1.0.1"
 }
 ```
 
-**Groovy DSL:**
+**Groovy DSL：**
 
 ```groovy
 plugins {
-    // ...
-    id "io.github.ncc0706.gradle-manifest-attributes" version "1.0.0"
+    id "io.github.ncc0706.gradle-manifest-attributes" version "1.0.1"
 }
 ```
 
-### Configuration
-
-The plugin provides an extension named `manifestAttributes`for optional customization.
-
-**Adding Custom Attributes:**
-
-You can define additional key-value pairs to be included in the manifest via the `customAttributes`map.
-
-**Kotlin DSL:**
+### 配置自定义属性
 
 ```kotlin
 manifestAttributes {
@@ -55,49 +48,160 @@ manifestAttributes {
 }
 ```
 
-## Default Attributes
+### 默认属性
 
-The plugin automatically adds the following attributes to the `MANIFEST.MF`file of all JAR tasks:
+| Attribute Key | Description | Example |
+|---------------|-------------|---------|
+| `Built-By` | 构建工具 | `Gradle 8.8` |
+| `Build-Jdk` | JDK 版本 | `17.0.10` |
+| `JDK-Vendor` | JDK 厂商 | `Eclipse Adoptium` |
+| `JDK-Version` | JDK 详细版本 | `17.0.10 (...)` |
+| `Build-OS` | 操作系统 | `Windows 11 10.0 amd64` |
+| `Implementation-Title` | 项目名 | `my-library` |
+| `Implementation-Version` | 项目版本 | `1.2.3` |
+| `Build-Date` | 构建日期 | `2024-05-15` |
+| `Build-Time` | 构建时间 | `2024-05-15T16:12:45.123Z` |
+| `Project-Name` | 项目名 | `my-library` |
+| `Project-Group` | group | `com.example` |
+| `Project-Version` | version | `1.2.3` |
+| `Plugin-Name` | 本插件标识 | `Gradle manifest plugin` |
 
-| Attribute Key            | Description                                                  | Example Value                  |
-| :----------------------- | :----------------------------------------------------------- | :----------------------------- |
-| `Built-By`               | The tool used to build the project.                          | `Gradle 8.8`                   |
-| `Build-Jdk`              | Version of the JDK used for compilation.                     | `17.0.10`                      |
-| `JDK-Vendor`             | Vendor of the JDK.                                           | `Oracle Corporation`           |
-| `JDK-Version`            | Detailed JDK version information.                            | `17.0.10 (Oracle GraalVM ...)` |
-| `Build-OS`               | Operating system and architecture where the build was executed. | `Windows 11 10.0 amd64`        |
-| `Implementation-Title`   | The name of the project.                                     | `my-awesome-library`           |
-| `Implementation-Version` | The version of the project.                                  | `1.2.3`                        |
-| `Build-Date`             | The date of the build (ISO-8601 date).                       | `2024-05-15`                   |
-| `Build-Time`             | The precise time of the build (ISO-8601 date-time).          | `2024-05-15T16:12:45.123Z`     |
-| `Project-Name`           | The name of the project (redundant with Implementation-Title). | `my-awesome-library`           |
-| `Project-Group`          | The group identifier of the project.                         | `com.example`                  |
-| `Project-Version`        | The version of the project (redundant with Implementation-Version). | `1.2.3`                        |
-| `Plugin-Name`            | The name of this plugin.                                     | `Gradle manifest plugin`       |
+---
 
-## Example Output
+## 2. Platforms Plugin
 
-A snippet of the generated `MANIFEST.MF`file will resemble the following:
+### 解决什么问题
 
-```
-Manifest-Version: 1.0
-Built-By: Gradle 8.8
-Build-Jdk: 11.0.25
-JDK-Vendor: Eclipse Adoptium
-JDK-Version: 11.0.25 (Temurin-11.0.25+9)
-Build-OS: Windows 10 10.0 amd64
-Implementation-Title: gradle-manifest-attributes
-Implementation-Version: 1.0.0
-Build-Date: 2025-08-28
-Build-Time: 2025-08-28T14:54:51.0469411
-Project-Name: gradle-manifest-attributes
-Project-Group: io.github.ncc0706
-Project-Version: 1.0.0
-Plugin-Name: Gradle manifest plugin
-Custom1: custom1
-Custom2: gradle-manifest-attributes
-Custom3: 1.0.0
+Gradle 的 `platform(...)` / BOM **按 configuration 生效**。只写：
 
+```kotlin
+implementation(platform("org.springframework.boot:spring-boot-dependencies:x.y.z"))
 ```
 
-**Note:** This plugin is designed to work with the standard Gradle `Jar`task. It will configure the manifest for all tasks of this type within the project where the plugin is applied.
+时，`annotationProcessor` / `compileOnly` 上的无版本依赖（如 Lombok）**往往解析失败**。
+
+本插件创建一个内部配置 `dependencyPlatforms`，并让常用配置继承它，从而一次声明、多处生效。
+
+### 应用
+
+```kotlin
+plugins {
+    `java-library`
+    id("io.github.ncc0706.gradle-platforms") version "1.0.1"
+}
+```
+
+### `from` 用法
+
+#### 坐标字符串
+
+```kotlin
+platforms {
+    from("org.springframework.boot:spring-boot-dependencies:3.4.7")
+    from("cn.hutool:hutool-bom:5.8.35")
+    // from("org.mybatis:mybatis-bom:3.5.19")
+}
+```
+
+#### Version Catalog（推荐，无需 `.get()`）
+
+`gradle/libs.versions.toml`：
+
+```toml
+[versions]
+spring-boot = "3.4.7"
+
+[libraries]
+spring-boot-dependencies = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "spring-boot" }
+```
+
+业务工程：
+
+```kotlin
+platforms {
+    from(libs.spring.boot.dependencies)
+}
+
+dependencies {
+    // 不必写入 libs.versions.toml；坐标无版本，由 BOM 约束
+    compileOnly("org.projectlombok:lombok")
+    annotationProcessor("org.projectlombok:lombok")
+}
+```
+
+若仍想用 catalog 别名，也可以只声明模块名、不写版本：
+
+```toml
+lombok = { module = "org.projectlombok:lombok" }
+```
+
+```kotlin
+compileOnly(libs.lombok)
+```
+
+两种都行；**推荐前者**（catalog 不维护 lombok）。
+#### 多模块根工程
+
+```kotlin
+subprojects {
+    apply(plugin = "io.github.ncc0706.gradle-platforms")
+
+    extensions.configure<io.github.ncc0706.gradle.plugin.PlatformsExtension>("platforms") {
+        from(rootProject.libs.spring.boot.dependencies)
+    }
+}
+```
+
+### 默认作用的配置
+
+- `implementation`
+- `compileOnly`
+- `annotationProcessor`
+- `testImplementation`
+- `testCompileOnly`
+- `testAnnotationProcessor`
+
+### 调整作用范围
+
+```kotlin
+platforms {
+    from(libs.spring.boot.dependencies)
+    // 覆盖默认列表
+    applyTo("implementation", "compileOnly", "annotationProcessor")
+    // 或在默认基础上追加
+    applyToAlso("api", "runtimeOnly")
+}
+```
+
+### 本地 SNAPSHOT 联调
+
+1. 插件工程：`./gradlew publishToMavenLocal`
+2. 业务工程 `settings.gradle.kts` 最前面：
+
+```kotlin
+pluginManagement {
+    repositories {
+        mavenLocal()
+        gradlePluginPortal()
+    }
+}
+```
+
+3. 若使用了会 `clear()` 插件仓库的全局 `init.gradle(.kts)`，务必把 `mavenLocal()` 加回去。
+
+---
+
+## 发布说明
+
+- 同仓双插件，版本号一致（如 `1.0.1`）
+- **Gradle Plugin Portal 不支持 SNAPSHOT**；本地 / 私服可用 `x.y.z-SNAPSHOT`
+- 首次发布 `gradle-platforms` 到 Portal 时，需为新 Plugin ID 完成认领
+
+## 开发与测试
+
+```bash
+./gradlew test
+./gradlew publishToMavenLocal
+```
+
+使用 Gradle TestKit 覆盖 Manifest / Platforms 的基本功能场景。
