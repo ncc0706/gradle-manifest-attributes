@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "io.github.ncc0706"
-version = "1.0.1"
+version = "1.0.0"
 
 repositories {
     mavenCentral()
@@ -49,8 +49,4 @@ gradlePlugin {
 
 tasks.withType<Test> {
     useJUnitPlatform()
-}
-
-tasks.withType<Wrapper> {
-    distributionUrl = "https://mirrors.huaweicloud.com/gradle/gradle-8.8-all.zip"
 }
