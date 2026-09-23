@@ -10,9 +10,9 @@ plugins {
 group = "io.github.ncc0706"
 version = "1.0.1"
 
-repositories {
-    mavenCentral()
-}
+//repositories {
+//    mavenCentral()
+//}
 
 
 java {
@@ -41,22 +41,26 @@ gradlePlugin {
     vcsUrl.set("https://github.com/ncc0706/gradle-manifest-attributes")
     plugins {
         create("manifestAttributesPlugin") {
-//            version = "1.0.1"
+            version = "1.0.1-SNAPSHOT"
             id = "io.github.ncc0706.gradle-manifest-attributes"
             implementationClass = "io.github.ncc0706.gradle.plugin.ManifestAttributesPlugin"
             displayName = "Manifest Attributes Plugin"
             description = "Adds standardized attributes to JAR manifests"
             tags.set(listOf("Manifest", "Attributes"))
         }
+        create("platformsPlugin") {
+            version = "1.0.1-SNAPSHOT"
+            id = "io.github.ncc0706.gradle-platforms"
+            implementationClass = "io.github.ncc0706.gradle.plugin.PlatformsPlugin"
+            displayName = "Dependency Platforms Plugin"
+            description = "Applies one or more BOMs/platforms to compileOnly, annotationProcessor and related configurations"
+            tags.set(listOf("BOM", "Platform", "Dependencies"))
+        }
     }
 }
 
 tasks.withType<Test> {
     useJUnitPlatform()
-}
-
-tasks.withType<Wrapper> {
-    distributionUrl = "https://mirrors.huaweicloud.com/gradle/gradle-8.8-all.zip"
 }
 
 //Throwable().printStackTrace()
