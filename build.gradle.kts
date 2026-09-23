@@ -10,6 +10,10 @@ plugins {
 group = "io.github.ncc0706"
 version = "0.0.1-SNAPSHOT"
 
+base {
+    archivesName.set("gradle-plugins")
+}
+
 repositories {
     mavenCentral()
 }
@@ -44,19 +48,21 @@ gradlePlugin {
             id = "io.github.ncc0706.gradle-platforms"
             implementationClass = "io.github.ncc0706.gradle.plugin.PlatformsPlugin"
             displayName = "Dependency Platforms Plugin"
-            description = "Applies one or more BOMs/platforms to compileOnly, annotationProcessor and related configurations"
+            description =
+                "Applies one or more BOMs/platforms to compileOnly, annotationProcessor and related configurations"
             tags.set(listOf("BOM", "Platform", "Dependencies"))
         }
     }
 }
 
 mavenPublishing {
+    coordinates(group.toString(), "gradle-plugins", version.toString())
     publishToMavenCentral(true)
     configure(GradlePublishPlugin())
     signAllPublications()
 
     pom {
-        name.set("gradle-manifest-attributes")
+        name.set("gradle-plugins")
         description.set("Gradle plugins: JAR manifest attributes and multi-BOM platforms support")
         url.set("https://github.com/ncc0706/gradle-manifest-attributes")
         licenses {
@@ -82,8 +88,4 @@ mavenPublishing {
 
 tasks.withType<Test> {
     useJUnitPlatform()
-}
-
-tasks.withType<Wrapper> {
-    distributionUrl = "https://mirrors.huaweicloud.com/gradle/gradle-8.8-all.zip"
 }

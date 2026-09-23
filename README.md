@@ -24,7 +24,7 @@
 
 ```kotlin
 plugins {
-    id("io.github.ncc0706.gradle-manifest-attributes") version "1.0.1"
+    id("io.github.ncc0706.gradle-manifest-attributes") version "0.0.1"
 }
 ```
 
@@ -32,7 +32,7 @@ plugins {
 
 ```groovy
 plugins {
-    id "io.github.ncc0706.gradle-manifest-attributes" version "1.0.1"
+    id "io.github.ncc0706.gradle-manifest-attributes" version "0.0.1"
 }
 ```
 
@@ -87,7 +87,7 @@ implementation(platform("org.springframework.boot:spring-boot-dependencies:x.y.z
 ```kotlin
 plugins {
     `java-library`
-    id("io.github.ncc0706.gradle-platforms") version "1.0.1"
+    id("io.github.ncc0706.gradle-platforms") version "0.0.1"
 }
 ```
 
@@ -193,7 +193,8 @@ pluginManagement {
 
 ## 发布说明
 
-- 同仓双插件，版本号一致（当前 `1.0.1-SNAPSHOT`）
+- 同仓双插件，版本号一致（当前 `0.0.1-SNAPSHOT`）
+- Maven 主坐标：`io.github.ncc0706:gradle-plugins`（插件 ID 不变）
 - **双端发布**：
   - Maven Central：`com.vanniktech.maven.publish` → `publishToMavenCentral`（支持 Snapshot）
   - Gradle Plugin Portal：`com.gradle.plugin-publish` → `publishPlugins`（仅正式版，不支持 Snapshot）
@@ -222,7 +223,7 @@ gradle.publish.secret=...
 # Maven Central Snapshot（version 需以 -SNAPSHOT 结尾）
 ./gradlew publishToMavenCentral
 
-# Plugin Portal（请使用非 SNAPSHOT 正式版，如 1.0.1）
+# Plugin Portal（请使用非 SNAPSHOT 正式版，如 0.0.1）
 ./gradlew publishPlugins
 ```
 
